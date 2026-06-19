@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './aiGeneratedLikelihood';
+export * from './aiGeneratedLikelihoodLikelihood';
 export * from './analysisRecord';
 export * from './analysisRecordRiskLevel';
 export * from './analysisResult';
@@ -15,6 +17,8 @@ export * from './authorizationSessionHeaderParameter';
 export * from './authUser';
 export * from './authUserEnvelope';
 export * from './beginBrowserLoginParams';
+export * from './deleteRecordResponse';
+export * from './domainComparison';
 export * from './educationalTechnique';
 export * from './educationMode';
 export * from './emergencyAction';
@@ -25,6 +29,7 @@ export * from './emergencyResponseSeverity';
 export * from './errorResponse';
 export * from './handleBrowserLoginCallbackParams';
 export * from './healthStatus';
+export * from './reportingLink';
 export * from './scamStats';
 export * from './scamStatsByRiskLevel';
 export * from './scamStatsByType';

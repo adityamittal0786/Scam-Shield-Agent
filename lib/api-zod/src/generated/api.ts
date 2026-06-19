@@ -97,7 +97,24 @@ export const AnalyzeContentResponse = zod.object({
   "usesUrlShortener": zod.boolean(),
   "suspiciousKeywords": zod.array(zod.string()),
   "recommendation": zod.string()
-}).optional()
+}).optional(),
+  "domainComparison": zod.object({
+  "detected": zod.boolean(),
+  "submittedDomain": zod.string(),
+  "officialDomain": zod.string(),
+  "isOfficial": zod.boolean(),
+  "brand": zod.string()
+}).optional(),
+  "aiGeneratedLikelihood": zod.object({
+  "likelihood": zod.enum(['Low', 'Moderate', 'High']),
+  "reasons": zod.array(zod.string()),
+  "disclaimer": zod.string()
+}).optional(),
+  "reportingLinks": zod.array(zod.object({
+  "platform": zod.string(),
+  "url": zod.string(),
+  "description": zod.string()
+})).optional()
 })
 
 
@@ -106,7 +123,7 @@ export const AnalyzeContentResponse = zod.object({
  */
 export const GetEmergencyActionsBody = zod.object({
   "scamContext": zod.string().optional().describe('Optional description of the scam encountered'),
-  "exposures": zod.array(zod.string()).describe('List of what was exposed (e.g. \"otp\", \"bank_details\", \"installed_app\", \"scanned_qr\", \"sent_money\", \"shared_password\", \"clicked_link\")')
+  "exposures": zod.array(zod.string()).describe('List of what was exposed')
 })
 
 export const GetEmergencyActionsResponse = zod.object({
@@ -134,6 +151,18 @@ export const GetAnalysisHistoryResponseItem = zod.object({
   "analyzedAt": zod.string()
 })
 export const GetAnalysisHistoryResponse = zod.array(GetAnalysisHistoryResponseItem)
+
+
+/**
+ * @summary Delete a single analysis record by ID
+ */
+export const DeleteAnalysisRecordParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAnalysisRecordResponse = zod.object({
+  "success": zod.boolean()
+})
 
 
 /**

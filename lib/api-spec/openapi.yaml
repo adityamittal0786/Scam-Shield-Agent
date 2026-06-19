@@ -13,7 +13,7 @@ tags:
   - name: scamshield
     description: ScamShield AI scam analysis operations
   - name: Auth
-    description: Browser and mobile authentication endpoints.
+    description: Browser authentication endpoints.
 paths:
   /healthz:
     get:
@@ -164,6 +164,31 @@ paths:
                 items:
                   $ref: "#/components/schemas/AnalysisRecord"
 
+  /scamshield/history/{id}:
+    delete:
+      operationId: deleteAnalysisRecord
+      tags: [scamshield]
+      summary: Delete a single analysis record by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteRecordResponse"
+        "404":
+          description: Record not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /scamshield/stats:
     get:
       operationId: getScamStats
@@ -211,6 +236,13 @@ components:
       required:
         - error
 
+    DeleteRecordResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+
     AuthUser:
       type: object
       required: [id, email, firstName, lastName, profileImageUrl]
@@ -256,7 +288,7 @@ components:
           type: array
           items:
             type: string
-          description: List of what was exposed (e.g. "otp", "bank_details", "installed_app", "scanned_qr", "sent_money", "shared_password", "clicked_link")
+          description: List of what was exposed
 
     EmergencyAction:
       type: object
@@ -325,6 +357,57 @@ components:
         whyThisMatters:
           type: string
 
+    DomainComparison:
+      type: object
+      required:
+        - detected
+        - submittedDomain
+        - officialDomain
+        - isOfficial
+        - brand
+      properties:
+        detected:
+          type: boolean
+        submittedDomain:
+          type: string
+        officialDomain:
+          type: string
+        isOfficial:
+          type: boolean
+        brand:
+          type: string
+
+    AiGeneratedLikelihood:
+      type: object
+      required:
+        - likelihood
+        - reasons
+        - disclaimer
+      properties:
+        likelihood:
+          type: string
+          enum: [Low, Moderate, High]
+        reasons:
+          type: array
+          items:
+            type: string
+        disclaimer:
+          type: string
+
+    ReportingLink:
+      type: object
+      required:
+        - platform
+        - url
+        - description
+      properties:
+        platform:
+          type: string
+        url:
+          type: string
+        description:
+          type: string
+
     AnalysisResult:
       type: object
       required:
@@ -372,6 +455,14 @@ components:
             type: string
         urlIntelligence:
           $ref: "#/components/schemas/UrlIntelligence"
+        domainComparison:
+          $ref: "#/components/schemas/DomainComparison"
+        aiGeneratedLikelihood:
+          $ref: "#/components/schemas/AiGeneratedLikelihood"
+        reportingLinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportingLink"
 
     UrlIntelligence:
       type: object

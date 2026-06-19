@@ -1,0 +1,85 @@
+Analysis Complete
+Identified as:
+Phishing
+Risk Level
+High
+Threat Score
+95/100
+AI Confidence
+95%
+The Bottom Line
+This message is a trick! It pretends to be from India Post saying your parcel is stuck and asks for a small fee to redeliver it. But the website link is fake, and they just want to steal your money or personal details. Don't click it!
+
+Red Flags Detected
+•
+The domain 'indiapost-track-update.net' is not the official India Post domain (which is indiapost.gov.in), indicating a fake website.
+•
+The message is an unsolicited request for a small, unexpected fee for parcel redelivery, a common tactic in phishing scams.
+•
+It uses urgency ('Failure to complete payment today') to pressure the recipient into immediate action without critical verification.
+•
+The message is generic, lacking specific parcel details or the recipient's name, which legitimate postal notifications usually include.
+What You Should Do
+Do not click on the provided link or enter any personal or financial information.
+Verify the status of any expected parcels directly through the official India Post website or app, using a tracking number you already possess.
+Report the message to India Post and your mobile service provider to help prevent others from falling victim.
+Block the sender's number to prevent further scam attempts.
+URL Safety Report
+Domain
+indiapost-track-update.net
+
+Threat Score
+90/100
+
+Typosquatting
+Yes: India Post
+URL Shortener
+No
+Suspicious Keywords Found
+track-update
+pay
+Do not click this link as it is highly suspicious and likely malicious, impersonating a legitimate postal service.
+
+Who Is Most Vulnerable?
+These groups are statistically more likely to be targeted or deceived by this scam type.
+Online shoppers
+Individuals expecting parcels
+Elderly individuals
+Less tech-savvy users
+Individuals unfamiliar with official India Post communication protocols
+How Scammers Hook You
+The step-by-step attack chain this scammer uses to extract money or data.
+1
+**Impersonation**: Send a message pretending to be from India Post, a trusted and recognized postal service.
+2
+**Problem Creation**: Fabricate a delivery issue (incomplete address) to create a sense of urgency and concern for the recipient.
+3
+**Demand for Payment**: Request a small, seemingly reasonable 'redelivery fee' (Rs 99) to make the request appear legitimate and low-risk.
+4
+**Phishing Link**: Provide a malicious URL designed to mimic an official payment portal, aiming to harvest financial details or personal information.
+5
+**Pressure Tactic**: Apply time pressure ('Failure to complete payment today') to rush the victim into action without critical thinking.
+6
+**Financial Gain/Credential Harvesting**: Once the victim clicks the link and enters details, the scammer either steals money directly or collects credentials for future fraudulent activities.
+Psychological Tactics Used
+Understanding how scammers manipulate emotions
+"Scammers use these tactics to bypass critical thinking and trick victims into revealing sensitive information or making payments."
+
+
+Detected
+Urgency
+
+Detected
+Authority
+
+Not Found
+Scarcity
+
+Detected
+Fear
+
+Not Found
+Emotional Manipulation
+
+Not Found
+Greed Appeal

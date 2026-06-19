@@ -13,6 +13,10 @@ export interface ErrorResponse {
   error: string;
 }
 
+export interface DeleteRecordResponse {
+  success: boolean;
+}
+
 export interface AuthUser {
   id: string;
   /** @nullable */
@@ -37,7 +41,7 @@ export interface AnalyzeInput {
 export interface EmergencyInput {
   /** Optional description of the scam encountered */
   scamContext?: string;
-  /** List of what was exposed (e.g. "otp", "bank_details", "installed_app", "scanned_qr", "sent_money", "shared_password", "clicked_link") */
+  /** List of what was exposed */
   exposures: string[];
 }
 
@@ -84,6 +88,35 @@ export interface EducationMode {
   whyThisMatters: string;
 }
 
+export interface DomainComparison {
+  detected: boolean;
+  submittedDomain: string;
+  officialDomain: string;
+  isOfficial: boolean;
+  brand: string;
+}
+
+export type AiGeneratedLikelihoodLikelihood = typeof AiGeneratedLikelihoodLikelihood[keyof typeof AiGeneratedLikelihoodLikelihood];
+
+
+export const AiGeneratedLikelihoodLikelihood = {
+  Low: 'Low',
+  Moderate: 'Moderate',
+  High: 'High',
+} as const;
+
+export interface AiGeneratedLikelihood {
+  likelihood: AiGeneratedLikelihoodLikelihood;
+  reasons: string[];
+  disclaimer: string;
+}
+
+export interface ReportingLink {
+  platform: string;
+  url: string;
+  description: string;
+}
+
 export type AnalysisResultRiskLevel = typeof AnalysisResultRiskLevel[keyof typeof AnalysisResultRiskLevel];
 
 
@@ -117,6 +150,9 @@ export interface AnalysisResult {
   vulnerableGroups: string[];
   scammerStrategy: string[];
   urlIntelligence?: UrlIntelligence;
+  domainComparison?: DomainComparison;
+  aiGeneratedLikelihood?: AiGeneratedLikelihood;
+  reportingLinks?: ReportingLink[];
 }
 
 export type AnalysisRecordRiskLevel = typeof AnalysisRecordRiskLevel[keyof typeof AnalysisRecordRiskLevel];

@@ -9,6 +9,6 @@
 export interface EmergencyInput {
   /** Optional description of the scam encountered */
   scamContext?: string;
-  /** List of what was exposed (e.g. "otp", "bank_details", "installed_app", "scanned_qr", "sent_money", "shared_password", "clicked_link") */
+  /** List of what was exposed */
   exposures: string[];
 }

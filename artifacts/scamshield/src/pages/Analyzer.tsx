@@ -73,10 +73,10 @@ export default function Analyzer() {
           queryClient.invalidateQueries({ queryKey: getGetAnalysisHistoryQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetScamStatsQueryKey() });
         },
-        onError: (error) => {
+        onError: () => {
           toast({
             title: "Analysis Failed",
-            description: error.error || "An unexpected error occurred during analysis.",
+            description: "An unexpected error occurred during analysis.",
             variant: "destructive"
           });
         }
@@ -349,7 +349,7 @@ export default function Analyzer() {
                 {emergencyMutation.data.actions.map((action, i) => (
                   <Card key={i} className={`border-l-4 ${
                     action.priority === 'immediate' ? 'border-l-red-500 bg-red-500/5' :
-                    action.priority === 'high' ? 'border-l-orange-500 bg-orange-500/5' :
+                    action.priority === 'urgent' ? 'border-l-orange-500 bg-orange-500/5' :
                     'border-l-yellow-500 bg-yellow-500/5'
                   }`}>
                     <CardContent className="p-4 flex flex-col gap-2">

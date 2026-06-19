@@ -5,8 +5,11 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AiGeneratedLikelihood } from './aiGeneratedLikelihood';
 import type { AnalysisResultRiskLevel } from './analysisResultRiskLevel';
+import type { DomainComparison } from './domainComparison';
 import type { EducationMode } from './educationMode';
+import type { ReportingLink } from './reportingLink';
 import type { UrlIntelligence } from './urlIntelligence';
 
 export interface AnalysisResult {
@@ -21,4 +24,7 @@ export interface AnalysisResult {
   vulnerableGroups: string[];
   scammerStrategy: string[];
   urlIntelligence?: UrlIntelligence;
+  domainComparison?: DomainComparison;
+  aiGeneratedLikelihood?: AiGeneratedLikelihood;
+  reportingLinks?: ReportingLink[];
 }

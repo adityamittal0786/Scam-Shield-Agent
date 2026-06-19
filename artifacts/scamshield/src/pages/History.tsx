@@ -1,14 +1,34 @@
-import { useGetAnalysisHistory } from "@workspace/api-client-react";
+import { useGetAnalysisHistory, useDeleteAnalysisRecord, getGetAnalysisHistoryQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
-import { History as HistoryIcon, Search } from "lucide-react";
+import { History as HistoryIcon, Search, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function History() {
   const { data: history, isLoading } = useGetAnalysisHistory();
+  const deleteRecord = useDeleteAnalysisRecord();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const handleDelete = (id: number) => {
+    deleteRecord.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getGetAnalysisHistoryQueryKey() });
+          toast({ title: "Record deleted", description: "The analysis record has been removed." });
+        },
+        onError: () => {
+          toast({ title: "Delete failed", description: "Could not delete the record. Please try again.", variant: "destructive" });
+        },
+      }
+    );
+  };
 
   const getRiskBadge = (level: string) => {
     switch (level) {
@@ -33,7 +53,7 @@ export default function History() {
           Analysis History
         </h1>
         <p className="text-muted-foreground text-lg">
-          A log of recently analyzed threats across the network.
+          A log of recently analyzed threats. Click the trash icon to delete any entry.
         </p>
       </div>
 
@@ -45,7 +65,7 @@ export default function History() {
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center p-12 opacity-50">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
             </div>
           ) : history && history.length > 0 ? (
             <div className="rounded-md border">
@@ -56,11 +76,12 @@ export default function History() {
                     <TableHead className="w-[150px] font-mono">Type</TableHead>
                     <TableHead className="font-mono">Content Snippet</TableHead>
                     <TableHead className="w-[120px] text-right font-mono">Analyzed</TableHead>
+                    <TableHead className="w-[60px]" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {history.map((record) => (
-                    <TableRow key={record.id}>
+                    <TableRow key={record.id} className="group">
                       <TableCell>{getRiskBadge(record.riskLevel)}</TableCell>
                       <TableCell className="font-medium text-xs text-primary">{record.scamType}</TableCell>
                       <TableCell className="max-w-xs truncate text-muted-foreground font-mono text-xs">
@@ -68,6 +89,19 @@ export default function History() {
                       </TableCell>
                       <TableCell className="text-right text-xs text-muted-foreground">
                         {formatDistanceToNow(new Date(record.analyzedAt), { addSuffix: true })}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => handleDelete(record.id)}
+                          disabled={deleteRecord.isPending}
+                          data-testid={`delete-record-${record.id}`}
+                          title="Delete record"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -1,12 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { Shield, History, BarChart3, BookOpen, LogIn, LogOut } from "lucide-react";
-import { useAuth } from "@workspace/replit-auth-web";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Shield, History, BarChart3, BookOpen } from "lucide-react";
 
 export function Navbar() {
   const [location] = useLocation();
-  const { user, login, logout, isLoading } = useAuth();
 
   const links = [
     { href: "/", label: "Analyzer", icon: Shield },
@@ -25,59 +21,26 @@ export function Navbar() {
               ScamShield
             </span>
           </div>
-          
-          {/* Desktop Navigation */}
-          <div className="flex items-center gap-2 md:gap-4">
-            <div className="hidden md:flex gap-1 overflow-x-auto">
-              {links.map((link) => {
-                const Icon = link.icon;
-                const isActive = location === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 shrink-0" />
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
-            
-            {/* Auth Section */}
-            {!isLoading && (
-              <div className="flex items-center gap-3 md:border-l md:border-border md:pl-4">
-                {user ? (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-8 w-8 border border-border">
-                        <AvatarImage src={user.profileImage} />
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {user.name?.charAt(0) || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium hidden sm:inline-block max-w-[120px] truncate">
-                        {user.name}
-                      </span>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={() => logout()} data-testid="logout-btn" className="px-2 md:px-3">
-                      <LogOut className="w-4 h-4 md:mr-2 shrink-0" />
-                      <span className="hidden md:inline-block">Logout</span>
-                    </Button>
-                  </>
-                ) : (
-                  <Button variant="outline" size="sm" onClick={() => login()} data-testid="login-btn">
-                    <LogIn className="w-4 h-4 mr-2 shrink-0" />
-                    Login
-                  </Button>
-                )}
-              </div>
-            )}
+
+          <div className="flex items-center gap-1 overflow-x-auto">
+            {links.map((link) => {
+              const Icon = link.icon;
+              const isActive = location === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span className="hidden sm:inline">{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

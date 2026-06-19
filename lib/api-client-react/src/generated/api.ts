@@ -25,6 +25,7 @@ import type {
   AnalyzeInput,
   AuthUserEnvelope,
   BeginBrowserLoginParams,
+  DeleteRecordResponse,
   EmergencyInput,
   EmergencyResponse,
   ErrorResponse,
@@ -662,6 +663,76 @@ export function useGetAnalysisHistory<TData = Awaited<ReturnType<typeof getAnaly
 
 
 
+
+export const getDeleteAnalysisRecordUrl = (id: number,) => {
+
+
+
+
+  return `/api/scamshield/history/${id}`
+}
+
+/**
+ * @summary Delete a single analysis record by ID
+ */
+export const deleteAnalysisRecord = async (id: number, options?: RequestInit): Promise<DeleteRecordResponse> => {
+
+  return customFetch<DeleteRecordResponse>(getDeleteAnalysisRecordUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAnalysisRecordMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAnalysisRecord>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAnalysisRecord>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAnalysisRecord'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAnalysisRecord>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAnalysisRecord(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAnalysisRecordMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAnalysisRecord>>>
+
+    export type DeleteAnalysisRecordMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Delete a single analysis record by ID
+ */
+export const useDeleteAnalysisRecord = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAnalysisRecord>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAnalysisRecord>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAnalysisRecordMutationOptions(options));
+    }
 
 export const getGetScamStatsUrl = () => {
 
