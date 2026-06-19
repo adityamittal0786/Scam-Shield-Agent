@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: scamshield
+    description: ScamShield AI scam analysis operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,69 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /scamshield/analyze:
+    post:
+      operationId: analyzeContent
+      tags: [scamshield]
+      summary: Analyze text for scam indicators
+      description: Uses AI to analyze text and detect scam patterns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeInput"
+      responses:
+        "200":
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /scamshield/history:
+    get:
+      operationId: getAnalysisHistory
+      tags: [scamshield]
+      summary: Get recent analysis history
+      description: Returns the most recent scam analyses
+      responses:
+        "200":
+          description: List of recent analyses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnalysisRecord"
+
+  /scamshield/stats:
+    get:
+      operationId: getScamStats
+      tags: [scamshield]
+      summary: Get scam detection statistics
+      description: Returns aggregated stats about scam types detected
+      responses:
+        "200":
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScamStats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +99,128 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    AnalyzeInput:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 1
+          description: The text content to analyze for scam indicators
+
+    EducationalTechnique:
+      type: object
+      required:
+        - name
+        - detected
+        - explanation
+      properties:
+        name:
+          type: string
+        detected:
+          type: boolean
+        explanation:
+          type: string
+
+    EducationMode:
+      type: object
+      required:
+        - techniques
+        - whyThisMatters
+      properties:
+        techniques:
+          type: array
+          items:
+            $ref: "#/components/schemas/EducationalTechnique"
+        whyThisMatters:
+          type: string
+
+    AnalysisResult:
+      type: object
+      required:
+        - type
+        - riskLevel
+        - confidenceScore
+        - reasoning
+        - recommendedActions
+        - preventionTips
+        - eli15
+        - educationMode
+      properties:
+        type:
+          type: string
+        riskLevel:
+          type: string
+          enum: [Low, Medium, High, Critical]
+        confidenceScore:
+          type: number
+        reasoning:
+          type: array
+          items:
+            type: string
+        recommendedActions:
+          type: array
+          items:
+            type: string
+        preventionTips:
+          type: array
+          items:
+            type: string
+        eli15:
+          type: string
+        educationMode:
+          $ref: "#/components/schemas/EducationMode"
+
+    AnalysisRecord:
+      type: object
+      required:
+        - id
+        - contentSnippet
+        - riskLevel
+        - scamType
+        - confidenceScore
+        - analyzedAt
+      properties:
+        id:
+          type: integer
+        contentSnippet:
+          type: string
+        riskLevel:
+          type: string
+          enum: [Low, Medium, High, Critical]
+        scamType:
+          type: string
+        confidenceScore:
+          type: number
+        analyzedAt:
+          type: string
+
+    ScamStats:
+      type: object
+      required:
+        - totalAnalyzed
+        - byRiskLevel
+        - byType
+        - averageConfidence
+      properties:
+        totalAnalyzed:
+          type: integer
+        byRiskLevel:
+          type: object
+          additionalProperties:
+            type: integer
+        byType:
+          type: object
+          additionalProperties:
+            type: integer
+        averageConfidence:
+          type: number
