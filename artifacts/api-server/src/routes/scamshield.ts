@@ -96,11 +96,15 @@ RETURN ONLY VALID JSON (no markdown, no code blocks):
     });
 
     const rawText = response.text ?? "{}";
+    const cleanedText = rawText
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*/gi, "")
+      .trim();
     let result;
     try {
-      result = JSON.parse(rawText);
+      result = JSON.parse(cleanedText);
     } catch {
-      res.status(500).json({ error: "Failed to parse AI response" });
+      res.status(500).json({ error: "Failed to parse AI response. Please try again." });
       return;
     }
 
@@ -189,11 +193,15 @@ Rules:
     });
 
     const rawText = response.text ?? "{}";
+    const cleanedText = rawText
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*/gi, "")
+      .trim();
     let result;
     try {
-      result = JSON.parse(rawText);
+      result = JSON.parse(cleanedText);
     } catch {
-      res.status(500).json({ error: "Failed to parse emergency response" });
+      res.status(500).json({ error: "Failed to parse emergency response. Please try again." });
       return;
     }
 
