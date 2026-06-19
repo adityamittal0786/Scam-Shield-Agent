@@ -155,6 +155,8 @@ components:
         - preventionTips
         - eli15
         - educationMode
+        - vulnerableGroups
+        - scammerStrategy
       properties:
         type:
           type: string
@@ -179,6 +181,16 @@ components:
           type: string
         educationMode:
           $ref: "#/components/schemas/EducationMode"
+        vulnerableGroups:
+          type: array
+          description: Groups of people most likely to fall for this scam
+          items:
+            type: string
+        scammerStrategy:
+          type: array
+          description: Step-by-step breakdown of how the scammer operates
+          items:
+            type: string
 
     AnalysisRecord:
       type: object

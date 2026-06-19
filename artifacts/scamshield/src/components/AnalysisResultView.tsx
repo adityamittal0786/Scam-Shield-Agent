@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AlertTriangle, CheckCircle, Info, Shield, ShieldAlert, Target, Lightbulb, UserCheck } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, Shield, ShieldAlert, Lightbulb, UserCheck, Users, Crosshair } from "lucide-react";
 
 interface AnalysisResultViewProps {
   result: AnalysisResult;
@@ -12,95 +12,121 @@ interface AnalysisResultViewProps {
 export function AnalysisResultView({ result }: AnalysisResultViewProps) {
   const getRiskColor = (level: string) => {
     switch (level) {
-      case "Low":
-        return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-      case "Medium":
-        return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
-      case "High":
-        return "bg-orange-500/10 text-orange-500 border-orange-500/20";
-      case "Critical":
-        return "bg-red-500/10 text-red-500 border-red-500/20";
-      default:
-        return "bg-muted text-muted-foreground border-border";
+      case "Low":    return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+      case "Medium": return "bg-yellow-500/10 text-yellow-400 border-yellow-500/30";
+      case "High":   return "bg-orange-500/10 text-orange-400 border-orange-500/30";
+      case "Critical": return "bg-red-500/10 text-red-400 border-red-500/30";
+      default:       return "bg-muted text-muted-foreground border-border";
     }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-red-400";
+    if (score >= 60) return "text-orange-400";
+    if (score >= 40) return "text-yellow-400";
+    return "text-emerald-400";
+  };
+
+  const getProgressColor = (score: number) => {
+    if (score >= 80) return "[&>div]:bg-red-500";
+    if (score >= 60) return "[&>div]:bg-orange-500";
+    if (score >= 40) return "[&>div]:bg-yellow-500";
+    return "[&>div]:bg-emerald-500";
   };
 
   const getRiskIcon = (level: string) => {
     switch (level) {
-      case "Low":
-        return <CheckCircle className="w-6 h-6 text-emerald-500" />;
+      case "Low":    return <CheckCircle className="w-5 h-5 text-emerald-400" />;
       case "Medium":
-      case "High":
-        return <AlertTriangle className="w-6 h-6 text-orange-500" />;
-      case "Critical":
-        return <ShieldAlert className="w-6 h-6 text-red-500" />;
-      default:
-        return <Info className="w-6 h-6 text-muted-foreground" />;
+      case "High":   return <AlertTriangle className="w-5 h-5 text-orange-400" />;
+      case "Critical": return <ShieldAlert className="w-5 h-5 text-red-400" />;
+      default:       return <Info className="w-5 h-5 text-muted-foreground" />;
+    }
+  };
+
+  const getBorderAccent = (level: string) => {
+    switch (level) {
+      case "Critical": return "border-red-500/40";
+      case "High":     return "border-orange-500/40";
+      case "Medium":   return "border-yellow-500/40";
+      default:         return "border-emerald-500/40";
     }
   };
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-      {/* Header Section */}
-      <Card className="border-2 shadow-lg" style={{ borderColor: result.riskLevel === 'Critical' ? 'hsl(var(--destructive)/0.5)' : result.riskLevel === 'High' ? 'hsl(var(--accent)/0.5)' : undefined }}>
-        <CardHeader className="pb-4">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
+    <div className="space-y-5 animate-in slide-in-from-bottom-4 duration-500">
+
+      {/* ── HEADER CARD ── */}
+      <Card className={`border-2 shadow-xl ${getBorderAccent(result.riskLevel)}`}>
+        <CardHeader className="pb-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2.5">
                 {getRiskIcon(result.riskLevel)}
-                <CardTitle className="text-3xl font-mono tracking-tight uppercase">Analysis Complete</CardTitle>
+                <CardTitle className="text-2xl font-mono tracking-tight uppercase">Analysis Complete</CardTitle>
               </div>
-              <CardDescription className="text-base flex items-center gap-2">
-                Identified as: <Badge variant="outline" className="font-mono text-primary border-primary/20 bg-primary/5">{result.type}</Badge>
+              <CardDescription className="text-sm flex items-center gap-2 flex-wrap">
+                Identified as:
+                <Badge variant="outline" className="font-mono text-primary border-primary/30 bg-primary/5">
+                  {result.type}
+                </Badge>
               </CardDescription>
             </div>
-            
-            <div className={`px-6 py-3 rounded-lg border-2 flex flex-col items-center justify-center min-w-[140px] ${getRiskColor(result.riskLevel)}`}>
-              <div className="text-xs font-mono uppercase tracking-wider mb-1 opacity-80">Risk Level</div>
-              <div className="text-2xl font-bold tracking-tight">{result.riskLevel}</div>
+
+            {/* Risk level + Threat Score side by side */}
+            <div className="flex items-stretch gap-3">
+              <div className={`px-5 py-3 rounded-lg border-2 flex flex-col items-center justify-center min-w-[110px] ${getRiskColor(result.riskLevel)}`}>
+                <div className="text-[10px] font-mono uppercase tracking-widest mb-1 opacity-70">Risk Level</div>
+                <div className="text-xl font-bold tracking-tight">{result.riskLevel}</div>
+              </div>
+              <div className="px-5 py-3 rounded-lg border-2 border-border/60 bg-card flex flex-col items-center justify-center min-w-[110px]">
+                <div className="text-[10px] font-mono uppercase tracking-widest mb-1 text-muted-foreground">Threat Score</div>
+                <div className={`text-xl font-bold font-mono tracking-tight ${getScoreColor(result.confidenceScore)}`}>
+                  {result.confidenceScore}<span className="text-sm text-muted-foreground font-normal">/100</span>
+                </div>
+              </div>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-2 pt-2 border-t border-border/50">
-            <div className="flex justify-between text-sm font-mono mb-1">
-              <span className="text-muted-foreground">Confidence Score</span>
-              <span className="text-primary font-bold">{result.confidenceScore}%</span>
+
+        <CardContent className="pt-0">
+          <div className="space-y-1.5 pt-3 border-t border-border/40">
+            <div className="flex justify-between text-xs font-mono">
+              <span className="text-muted-foreground">AI Confidence</span>
+              <span className="text-primary font-semibold">{result.confidenceScore}%</span>
             </div>
-            <Progress value={result.confidenceScore} className="h-2" />
+            <Progress value={result.confidenceScore} className={`h-1.5 ${getProgressColor(result.confidenceScore)}`} />
           </div>
         </CardContent>
       </Card>
 
-      {/* ELI15 Section */}
+      {/* ── ELI15 ── */}
       <Card className="bg-primary/5 border-primary/20">
-        <CardContent className="p-6 flex gap-4 items-start">
-          <div className="bg-primary/20 p-3 rounded-full shrink-0">
-            <Lightbulb className="w-6 h-6 text-primary" />
+        <CardContent className="p-5 flex gap-4 items-start">
+          <div className="bg-primary/20 p-2.5 rounded-full shrink-0 mt-0.5">
+            <Lightbulb className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold mb-2 font-mono text-foreground">The Bottom Line</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              {result.eli15}
-            </p>
+            <h3 className="text-base font-semibold mb-1.5 font-mono text-foreground">The Bottom Line</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">{result.eli15}</p>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Why this is suspicious */}
+      {/* ── RED FLAGS + WHAT TO DO ── */}
+      <div className="grid md:grid-cols-2 gap-5">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <ShieldAlert className="w-5 h-5 text-accent" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ShieldAlert className="w-4 h-4 text-destructive" />
               Red Flags Detected
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {result.reasoning.map((reason, i) => (
-                <li key={i} className="flex gap-3 items-start">
-                  <span className="text-accent mt-0.5">•</span>
+                <li key={i} className="flex gap-2.5 items-start">
+                  <span className="text-destructive mt-0.5 shrink-0">•</span>
                   <span className="text-sm text-muted-foreground">{reason}</span>
                 </li>
               ))}
@@ -108,19 +134,18 @@ export function AnalysisResultView({ result }: AnalysisResultViewProps) {
           </CardContent>
         </Card>
 
-        {/* Recommended Actions */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Shield className="w-5 h-5 text-primary" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Shield className="w-4 h-4 text-primary" />
               What You Should Do
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {result.recommendedActions.map((action, i) => (
-                <li key={i} className="flex gap-3 items-start">
-                  <CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                <li key={i} className="flex gap-2.5 items-start">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
                   <span className="text-sm text-muted-foreground">{action}</span>
                 </li>
               ))}
@@ -129,34 +154,93 @@ export function AnalysisResultView({ result }: AnalysisResultViewProps) {
         </Card>
       </div>
 
-      {/* Education Mode */}
+      {/* ── WHO IS MOST VULNERABLE ── */}
+      {result.vulnerableGroups && result.vulnerableGroups.length > 0 && (
+        <Card className="border-yellow-500/20 bg-yellow-500/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="w-4 h-4 text-yellow-400" />
+              Who Is Most Vulnerable?
+            </CardTitle>
+            <CardDescription className="text-xs">
+              These groups are statistically more likely to be targeted or deceived by this scam type.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {result.vulnerableGroups.map((group, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/20 rounded-md px-3 py-2"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 shrink-0" />
+                  <span className="text-sm text-yellow-200/90">{group}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── HOW SCAMMERS HOOK YOU ── */}
+      {result.scammerStrategy && result.scammerStrategy.length > 0 && (
+        <Card className="border-orange-500/20 bg-orange-500/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Crosshair className="w-4 h-4 text-orange-400" />
+              How Scammers Hook You
+            </CardTitle>
+            <CardDescription className="text-xs">
+              The step-by-step attack chain this scammer uses to extract money or data.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-3">
+              {result.scammerStrategy.map((step, i) => (
+                <li key={i} className="flex gap-3 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-bold font-mono flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm text-muted-foreground pt-0.5">{step.replace(/^Step \d+:\s*/i, "")}</span>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── PSYCHOLOGICAL TACTICS ── */}
       <Card className="border-dashed">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <UserCheck className="w-5 h-5 text-primary" />
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <UserCheck className="w-4 h-4 text-primary" />
             Psychological Tactics Used
           </CardTitle>
-          <CardDescription>Understanding how scammers manipulate emotions</CardDescription>
+          <CardDescription className="text-xs">Understanding how scammers manipulate emotions</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md italic border border-border">
+        <CardContent className="space-y-4">
+          <p className="text-xs text-muted-foreground bg-muted/50 px-4 py-3 rounded-md italic border border-border/60">
             "{result.educationMode.whyThisMatters}"
           </p>
-          
+
           <Accordion type="single" collapsible className="w-full">
             {result.educationMode.techniques.map((tech, i) => (
               <AccordionItem value={`tech-${i}`} key={i}>
-                <AccordionTrigger className="hover:no-underline">
+                <AccordionTrigger className="hover:no-underline py-3">
                   <div className="flex items-center gap-3 text-left">
                     {tech.detected ? (
-                      <Badge variant="destructive" className="bg-destructive/20 text-destructive border-destructive/30 uppercase font-mono text-[10px]">Detected</Badge>
+                      <Badge variant="destructive" className="bg-destructive/20 text-destructive border-destructive/30 uppercase font-mono text-[10px] shrink-0">
+                        Detected
+                      </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-muted-foreground font-mono text-[10px] uppercase">Not Found</Badge>
+                      <Badge variant="outline" className="text-muted-foreground font-mono text-[10px] uppercase shrink-0">
+                        Not Found
+                      </Badge>
                     )}
-                    <span className="font-semibold">{tech.name}</span>
+                    <span className="font-semibold text-sm">{tech.name}</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-[90px]">
+                <AccordionContent className="text-muted-foreground text-sm pl-[88px] pb-3">
                   {tech.explanation}
                 </AccordionContent>
               </AccordionItem>

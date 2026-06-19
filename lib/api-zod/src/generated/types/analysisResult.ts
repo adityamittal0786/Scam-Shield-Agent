@@ -17,4 +17,8 @@ export interface AnalysisResult {
   preventionTips: string[];
   eli15: string;
   educationMode: EducationMode;
+  /** Groups of people most likely to fall for this scam */
+  vulnerableGroups: string[];
+  /** Step-by-step breakdown of how the scammer operates */
+  scammerStrategy: string[];
 }

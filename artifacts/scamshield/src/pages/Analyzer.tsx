@@ -56,7 +56,7 @@ export default function Analyzer() {
           Threat Analyzer
         </h1>
         <p className="text-muted-foreground text-lg max-w-2xl">
-          Paste any suspicious text message, email, or social media message below. Our AI will break down exactly what it is and why it's dangerous.
+          Paste any suspicious message, email, URL, QR code content, job offer, or social media post. Our AI will break down exactly what it is and why it's dangerous.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export default function Analyzer() {
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste the suspicious message here... (e.g. 'URGENT: Your account has been locked. Click here to verify...')"
+              placeholder={"Paste anything suspicious here — a text message, email, URL, QR code content, job offer, social media DM, or phone call script...\n\nExamples:\n• 'URGENT: Your bank account has been locked. Click http://secure-verify.xyz to restore access.'\n• 'Congratulations! You have been selected for a $500/day work-from-home position.'\n• A URL like: http://amaz0n-support.net/account-verify\n• QR code destination URL"}
               className="min-h-[250px] font-mono text-sm resize-y p-6 bg-card border-2 focus-visible:ring-primary/50"
             />
           </div>

@@ -19,60 +19,41 @@ router.post("/analyze", async (req, res) => {
   const { content } = parsed.data;
 
   try {
-    const prompt = `You are the ScamShield AI Agent. Perform a multi-step security reasoning analysis on the provided text.
+    const prompt = `You are the ScamShield AI Agent. Analyze the provided input which may be a text message, email, URL, QR code content, social media post, job listing, or any other form of communication that could be used in a scam.
 
-TEXT TO ANALYZE:
+INPUT TO ANALYZE:
 "${content.replace(/"/g, '\\"')}"
 
-STEPS:
-1. Categorize the scam type (e.g., Fake Job Offer, Bank Verification, Phishing, Romance Scam, Lottery Scam, Tech Support, Investment Fraud, Emergency Scam, Prize Winning, etc.). If it appears legitimate, say "Legitimate".
-2. Analyze psychological triggers: Urgency, Authority, Scarcity, Fear, Emotional Manipulation, Greed, Trust Building.
-3. Evaluate risk level (Low, Medium, High, Critical) and assign confidence score 0-100.
-4. Formulate an 'Explain Like I'm 15' (ELI15) summary in plain, friendly language.
+ANALYSIS STEPS:
+1. Identify the medium/format (e.g., SMS, email, URL, job post, QR redirect, social media DM).
+2. Categorize the scam type (e.g., Fake Job Offer, Bank Verification, Phishing, Romance Scam, Lottery Scam, Tech Support, Investment Fraud, Emergency Scam, Prize Winning, QR Code Scam, Credential Harvesting, etc.). If legitimate, say "Legitimate".
+3. Analyze psychological triggers: Urgency, Authority, Scarcity, Fear, Emotional Manipulation, Greed, Trust Building.
+4. Evaluate risk level (Low/Medium/High/Critical) and confidence score 0-100. Be precise — use specific numbers like 73 or 91, not round numbers like 70 or 90.
+5. Identify which demographic groups are most vulnerable to this specific scam.
+6. Break down the scammer's step-by-step strategy as a numbered attack chain.
+7. Write an ELI15 summary in friendly, plain language.
 
 RETURN ONLY VALID JSON (no markdown, no code blocks):
 {
   "type": "string describing scam category",
   "riskLevel": "Low" | "Medium" | "High" | "Critical",
-  "confidenceScore": number between 0 and 100,
-  "reasoning": ["array", "of", "specific", "reasoning", "points"],
-  "recommendedActions": ["array", "of", "specific", "recommended", "actions"],
-  "preventionTips": ["array", "of", "prevention", "tips"],
-  "eli15": "A friendly explanation for a 15-year-old of why this is or isn't suspicious",
+  "confidenceScore": number 0-100 (be precise, not round),
+  "reasoning": ["3-5 specific red flag observations"],
+  "recommendedActions": ["3-5 concrete actions to take right now"],
+  "preventionTips": ["3-4 tips to avoid this type of scam in future"],
+  "eli15": "2-3 sentence plain English explanation for a 15-year-old",
+  "vulnerableGroups": ["specific demographic or situation description", "another group", "another group"],
+  "scammerStrategy": ["Step 1: what scammer does first", "Step 2: next action", "Step 3: how they extract value", "Step 4: what happens to the victim"],
   "educationMode": {
     "techniques": [
-      {
-        "name": "Urgency",
-        "detected": true or false,
-        "explanation": "How this technique is used or why it's absent"
-      },
-      {
-        "name": "Authority",
-        "detected": true or false,
-        "explanation": "How this technique is used or why it's absent"
-      },
-      {
-        "name": "Scarcity",
-        "detected": true or false,
-        "explanation": "How this technique is used or why it's absent"
-      },
-      {
-        "name": "Fear",
-        "detected": true or false,
-        "explanation": "How this technique is used or why it's absent"
-      },
-      {
-        "name": "Emotional Manipulation",
-        "detected": true or false,
-        "explanation": "How this technique is used or why it's absent"
-      },
-      {
-        "name": "Greed Appeal",
-        "detected": true or false,
-        "explanation": "How this technique is used or why it's absent"
-      }
+      { "name": "Urgency", "detected": true or false, "explanation": "one sentence" },
+      { "name": "Authority", "detected": true or false, "explanation": "one sentence" },
+      { "name": "Scarcity", "detected": true or false, "explanation": "one sentence" },
+      { "name": "Fear", "detected": true or false, "explanation": "one sentence" },
+      { "name": "Emotional Manipulation", "detected": true or false, "explanation": "one sentence" },
+      { "name": "Greed Appeal", "detected": true or false, "explanation": "one sentence" }
     ],
-    "whyThisMatters": "Why recognizing these patterns matters for personal safety"
+    "whyThisMatters": "one sentence on why recognizing these patterns matters"
   }
 }`;
 

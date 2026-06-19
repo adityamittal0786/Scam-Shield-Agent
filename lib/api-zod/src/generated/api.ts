@@ -43,7 +43,9 @@ export const AnalyzeContentResponse = zod.object({
   "explanation": zod.string()
 })),
   "whyThisMatters": zod.string()
-})
+}),
+  "vulnerableGroups": zod.array(zod.string()).describe('Groups of people most likely to fall for this scam'),
+  "scammerStrategy": zod.array(zod.string()).describe('Step-by-step breakdown of how the scammer operates')
 })
 
 
