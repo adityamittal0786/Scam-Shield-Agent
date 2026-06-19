@@ -9,7 +9,6 @@ import * as zod from 'zod';
 
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -18,14 +17,57 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * Uses AI to analyze text and detect scam patterns
- * @summary Analyze text for scam indicators
+ * @summary Get the currently authenticated user
+ */
+export const GetCurrentAuthUserHeader = zod.object({
+  "Authorization": zod.string().optional().describe('Opaque session token — `Bearer <sid>`.')
+})
+
+export const GetCurrentAuthUserResponse = zod.object({
+  "user": zod.union([zod.object({
+  "id": zod.string(),
+  "email": zod.string().email().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "profileImageUrl": zod.string().nullable()
+}),zod.null()])
+})
+
+
+/**
+ * @summary Start the browser OIDC login flow
+ */
+export const BeginBrowserLoginQueryParams = zod.object({
+  "returnTo": zod.coerce.string().optional()
+})
+
+
+/**
+ * @summary Complete the browser OIDC login flow
+ */
+export const HandleBrowserLoginCallbackQueryParams = zod.object({
+  "code": zod.coerce.string().optional(),
+  "state": zod.coerce.string().optional(),
+  "iss": zod.coerce.string().optional()
+})
+
+
+/**
+ * @summary Clear the session and begin OIDC logout
+ */
+export const LogoutBrowserSessionHeader = zod.object({
+  "Authorization": zod.string().optional().describe('Opaque session token — `Bearer <sid>`.')
+})
+
+
+/**
+ * @summary Analyze text/URL/QR content for scam indicators
  */
 
 
 
 export const AnalyzeContentBody = zod.object({
-  "content": zod.string().min(1).describe('The text content to analyze for scam indicators')
+  "content": zod.string().min(1)
 })
 
 export const AnalyzeContentResponse = zod.object({
@@ -44,13 +86,43 @@ export const AnalyzeContentResponse = zod.object({
 })),
   "whyThisMatters": zod.string()
 }),
-  "vulnerableGroups": zod.array(zod.string()).describe('Groups of people most likely to fall for this scam'),
-  "scammerStrategy": zod.array(zod.string()).describe('Step-by-step breakdown of how the scammer operates')
+  "vulnerableGroups": zod.array(zod.string()),
+  "scammerStrategy": zod.array(zod.string()),
+  "urlIntelligence": zod.object({
+  "isUrl": zod.boolean(),
+  "domain": zod.string(),
+  "threatScore": zod.number(),
+  "possibleTyposquatting": zod.boolean(),
+  "typosquattingTarget": zod.string().optional(),
+  "usesUrlShortener": zod.boolean(),
+  "suspiciousKeywords": zod.array(zod.string()),
+  "recommendation": zod.string()
+}).optional()
 })
 
 
 /**
- * Returns the most recent scam analyses
+ * @summary Get immediate recovery actions after clicking a scam
+ */
+export const GetEmergencyActionsBody = zod.object({
+  "scamContext": zod.string().optional().describe('Optional description of the scam encountered'),
+  "exposures": zod.array(zod.string()).describe('List of what was exposed (e.g. \"otp\", \"bank_details\", \"installed_app\", \"scanned_qr\", \"sent_money\", \"shared_password\", \"clicked_link\")')
+})
+
+export const GetEmergencyActionsResponse = zod.object({
+  "severity": zod.enum(['moderate', 'serious', 'critical']),
+  "summary": zod.string(),
+  "actions": zod.array(zod.object({
+  "priority": zod.enum(['immediate', 'urgent', 'soon']),
+  "title": zod.string(),
+  "description": zod.string(),
+  "timeframe": zod.string()
+})),
+  "hotlines": zod.array(zod.string())
+})
+
+
+/**
  * @summary Get recent analysis history
  */
 export const GetAnalysisHistoryResponseItem = zod.object({
@@ -65,7 +137,6 @@ export const GetAnalysisHistoryResponse = zod.array(GetAnalysisHistoryResponseIt
 
 
 /**
- * Returns aggregated stats about scam types detected
  * @summary Get scam detection statistics
  */
 export const GetScamStatsResponse = zod.object({

@@ -6,17 +6,22 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import Analyzer from "@/pages/Analyzer";
 import History from "@/pages/History";
 import Stats from "@/pages/Stats";
+import Learn from "@/pages/Learn";
 import NotFound from "@/pages/not-found";
+import { useAuth } from "@workspace/replit-auth-web";
 
 const queryClient = new QueryClient();
 
 function Router() {
+  useAuth();
+  
   return (
     <AppLayout>
       <Switch>
         <Route path="/" component={Analyzer} />
         <Route path="/history" component={History} />
         <Route path="/stats" component={Stats} />
+        <Route path="/learn" component={Learn} />
         <Route component={NotFound} />
       </Switch>
     </AppLayout>

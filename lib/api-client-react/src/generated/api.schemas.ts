@@ -13,12 +13,64 @@ export interface ErrorResponse {
   error: string;
 }
 
+export interface AuthUser {
+  id: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastName: string | null;
+  /** @nullable */
+  profileImageUrl: string | null;
+}
+
+export interface AuthUserEnvelope {
+  user: AuthUser | null;
+}
+
 export interface AnalyzeInput {
-  /**
-     * The text content to analyze for scam indicators
-     * @minLength 1
-     */
+  /** @minLength 1 */
   content: string;
+}
+
+export interface EmergencyInput {
+  /** Optional description of the scam encountered */
+  scamContext?: string;
+  /** List of what was exposed (e.g. "otp", "bank_details", "installed_app", "scanned_qr", "sent_money", "shared_password", "clicked_link") */
+  exposures: string[];
+}
+
+export type EmergencyActionPriority = typeof EmergencyActionPriority[keyof typeof EmergencyActionPriority];
+
+
+export const EmergencyActionPriority = {
+  immediate: 'immediate',
+  urgent: 'urgent',
+  soon: 'soon',
+} as const;
+
+export interface EmergencyAction {
+  priority: EmergencyActionPriority;
+  title: string;
+  description: string;
+  timeframe: string;
+}
+
+export type EmergencyResponseSeverity = typeof EmergencyResponseSeverity[keyof typeof EmergencyResponseSeverity];
+
+
+export const EmergencyResponseSeverity = {
+  moderate: 'moderate',
+  serious: 'serious',
+  critical: 'critical',
+} as const;
+
+export interface EmergencyResponse {
+  severity: EmergencyResponseSeverity;
+  summary: string;
+  actions: EmergencyAction[];
+  hotlines: string[];
 }
 
 export interface EducationalTechnique {
@@ -42,6 +94,17 @@ export const AnalysisResultRiskLevel = {
   Critical: 'Critical',
 } as const;
 
+export interface UrlIntelligence {
+  isUrl: boolean;
+  domain: string;
+  threatScore: number;
+  possibleTyposquatting: boolean;
+  typosquattingTarget?: string;
+  usesUrlShortener: boolean;
+  suspiciousKeywords: string[];
+  recommendation: string;
+}
+
 export interface AnalysisResult {
   type: string;
   riskLevel: AnalysisResultRiskLevel;
@@ -51,10 +114,9 @@ export interface AnalysisResult {
   preventionTips: string[];
   eli15: string;
   educationMode: EducationMode;
-  /** Groups of people most likely to fall for this scam */
   vulnerableGroups: string[];
-  /** Step-by-step breakdown of how the scammer operates */
   scammerStrategy: string[];
+  urlIntelligence?: UrlIntelligence;
 }
 
 export type AnalysisRecordRiskLevel = typeof AnalysisRecordRiskLevel[keyof typeof AnalysisRecordRiskLevel];
@@ -86,4 +148,19 @@ export interface ScamStats {
   byType: ScamStatsByType;
   averageConfidence: number;
 }
+
+/**
+ * Opaque session token — `Bearer <sid>`.
+ */
+export type AuthorizationSessionHeaderParameter = string;
+
+export type BeginBrowserLoginParams = {
+returnTo?: string;
+};
+
+export type HandleBrowserLoginCallbackParams = {
+code?: string;
+state?: string;
+iss?: string;
+};
 

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AlertTriangle, CheckCircle, Info, Shield, ShieldAlert, Lightbulb, UserCheck, Users, Crosshair } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, Shield, ShieldAlert, Lightbulb, UserCheck, Users, Crosshair, Globe } from "lucide-react";
 
 interface AnalysisResultViewProps {
   result: AnalysisResult;
@@ -79,9 +79,9 @@ export function AnalysisResultView({ result }: AnalysisResultViewProps) {
                 <div className="text-[10px] font-mono uppercase tracking-widest mb-1 opacity-70">Risk Level</div>
                 <div className="text-xl font-bold tracking-tight">{result.riskLevel}</div>
               </div>
-              <div className="px-5 py-3 rounded-lg border-2 border-border/60 bg-card flex flex-col items-center justify-center min-w-[110px]">
+              <div className="px-5 py-3 rounded-lg border-2 border-border/60 bg-card flex flex-col items-center justify-center min-w-[120px]">
                 <div className="text-[10px] font-mono uppercase tracking-widest mb-1 text-muted-foreground">Threat Score</div>
-                <div className={`text-xl font-bold font-mono tracking-tight ${getScoreColor(result.confidenceScore)}`}>
+                <div className={`text-3xl font-bold font-mono tracking-tighter ${getScoreColor(result.confidenceScore)}`}>
                   {result.confidenceScore}<span className="text-sm text-muted-foreground font-normal">/100</span>
                 </div>
               </div>
@@ -153,6 +153,75 @@ export function AnalysisResultView({ result }: AnalysisResultViewProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* ── URL INTELLIGENCE ── */}
+      {result.urlIntelligence?.isUrl === true && (
+        <Card className="border-blue-500/20 bg-blue-500/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Globe className="w-4 h-4 text-blue-400" />
+              URL Safety Report
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="space-y-1">
+                <span className="text-xs text-muted-foreground uppercase font-mono">Domain</span>
+                <p className="font-mono text-sm text-foreground truncate" title={result.urlIntelligence.domain || ""}>
+                  {result.urlIntelligence.domain || "Unknown"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-xs text-muted-foreground uppercase font-mono">Threat Score</span>
+                <p className={`font-mono font-bold text-sm ${getScoreColor(result.urlIntelligence.threatScore || 0)}`}>
+                  {result.urlIntelligence.threatScore}/100
+                </p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-xs text-muted-foreground uppercase font-mono">Typosquatting</span>
+                <div>
+                  {result.urlIntelligence.possibleTyposquatting ? (
+                    <Badge variant="destructive" className="bg-destructive/20 text-destructive border-destructive/30 uppercase font-mono text-[10px]">
+                      Yes: {result.urlIntelligence.typosquattingTarget}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-muted-foreground font-mono text-[10px] uppercase">No</Badge>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <span className="text-xs text-muted-foreground uppercase font-mono">URL Shortener</span>
+                <div>
+                  {result.urlIntelligence.usesUrlShortener ? (
+                    <Badge variant="secondary" className="bg-orange-500/20 text-orange-500 border-orange-500/30 uppercase font-mono text-[10px]">Yes</Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-muted-foreground font-mono text-[10px] uppercase">No</Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {result.urlIntelligence.suspiciousKeywords && result.urlIntelligence.suspiciousKeywords.length > 0 && (
+              <div className="space-y-2 border-t border-blue-500/10 pt-4">
+                <span className="text-xs text-muted-foreground uppercase font-mono">Suspicious Keywords Found</span>
+                <div className="flex flex-wrap gap-2">
+                  {result.urlIntelligence.suspiciousKeywords.map((kw, i) => (
+                    <Badge key={i} variant="outline" className="border-blue-500/30 text-blue-400 bg-blue-500/10 font-mono text-xs">
+                      {kw}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {result.urlIntelligence.recommendation && (
+              <p className="text-sm italic text-muted-foreground mt-2 border-l-2 border-blue-500/30 pl-3">
+                {result.urlIntelligence.recommendation}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── WHO IS MOST VULNERABLE ── */}
       {result.vulnerableGroups && result.vulnerableGroups.length > 0 && (

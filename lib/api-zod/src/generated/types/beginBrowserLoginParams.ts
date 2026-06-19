@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface AnalyzeInput {
-  /** @minLength 1 */
-  content: string;
-}
+export type BeginBrowserLoginParams = {
+returnTo?: string;
+};
