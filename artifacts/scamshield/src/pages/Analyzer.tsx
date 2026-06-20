@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Shield, AlertCircle, UploadCloud, TriangleAlert, FileImage } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AnalysisLoadingState } from "@/components/AnalysisLoadingState";
+import { AgentThinkingTimeline } from "@/components/AgentThinkingTimeline";
 import { AnalysisResultView } from "@/components/AnalysisResultView";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -288,8 +288,8 @@ export default function Analyzer() {
       )}
 
       {analyzeMutation.isPending && (
-        <div className="h-[400px] border-2 border-dashed border-border rounded-xl bg-card/50 flex items-center justify-center">
-          <AnalysisLoadingState />
+        <div className="border-2 border-dashed border-primary/20 rounded-xl bg-card/50 flex items-center justify-center py-4">
+          <AgentThinkingTimeline />
         </div>
       )}
 

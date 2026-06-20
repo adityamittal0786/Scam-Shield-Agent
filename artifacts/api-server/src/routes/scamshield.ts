@@ -1,125 +1,78 @@
+/**
+ * ScamShield API Routes
+ *
+ * This module wires the multi-agent orchestrator into the Express route layer.
+ * Security checks (rate limiting, input validation) run BEFORE the orchestrator
+ * is invoked, ensuring no agent ever receives malicious input.
+ *
+ * Route overview:
+ *   POST /analyze      → Full multi-agent analysis pipeline
+ *   POST /emergency    → Emergency recovery action plan
+ *   GET  /history      → Recent analysis records
+ *   DELETE /history/:id → Delete a record
+ *   GET  /stats        → Aggregate statistics
+ */
+
 import { Router } from "express";
 import { GoogleGenAI } from "@google/genai";
-import { db } from "@workspace/db";
-import { analysesTable } from "@workspace/db";
+import { db, analysesTable } from "@workspace/db";
 import { desc, sql, eq } from "drizzle-orm";
 import { AnalyzeContentBody, GetEmergencyActionsBody } from "@workspace/api-zod";
+import { runOrchestrator } from "../agents/orchestrator.js";
+import { validateInput, checkRateLimit, sanitizeInput } from "../lib/security.js";
 
 const router = Router();
 
+// Shared AI client for the emergency route (other routes use agent modules)
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY || "" });
 
 // ─── POST /analyze ────────────────────────────────────────────────────────────
 router.post("/analyze", async (req, res) => {
-  const parsed = AnalyzeContentBody.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: "content is required" });
+  // 1. Rate limiting — enforce per-IP request budget
+  const ip = (req.headers["x-forwarded-for"] as string) || req.socket.remoteAddress || "unknown";
+  const rateCheck = checkRateLimit(ip);
+  if (!rateCheck.allowed) {
+    res.status(429).json({
+      error: `Too many requests. Please wait ${Math.ceil((rateCheck.retryAfterMs ?? 60000) / 1000)} seconds before trying again.`,
+    });
     return;
   }
 
-  const { content } = parsed.data;
-  const urlRegex = /https?:\/\/[^\s]+/i;
-  const isUrl = urlRegex.test(content.trim());
+  // 2. Zod schema validation
+  const parsed = AnalyzeContentBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "content field is required." });
+    return;
+  }
+
+  // 3. Security validation (injection detection + sanitization)
+  const validation = validateInput(parsed.data.content);
+  if (!validation.valid) {
+    res.status(400).json({ error: validation.reason });
+    return;
+  }
 
   try {
-    const urlBlock = isUrl ? `
-9. URL INTELLIGENCE: analyze the URL.
-   - Extract domain
-   - Detect typosquatting (amaz0n, paypa1, etc.)
-   - Detect URL shortener (bit.ly, tinyurl, t.co, etc.)
-   - List suspicious path/param keywords
-   - URL threat score 0-100
-   Include: "urlIntelligence": { "isUrl": true, "domain": "...", "threatScore": N, "possibleTyposquatting": bool, "typosquattingTarget": "brand or empty", "usesUrlShortener": bool, "suspiciousKeywords": [], "recommendation": "one sentence" }
+    // 4. Run the full multi-agent orchestrator pipeline
+    //    (Intake → Threat+URL in parallel → Education+Vulnerability+Reporting)
+    const result = await runOrchestrator(parsed.data.content);
 
-10. DOMAIN COMPARISON: If the URL appears to impersonate a known brand/institution (India Post, SBI, HDFC, PayPal, Amazon, etc.):
-   Include: "domainComparison": { "detected": true, "submittedDomain": "the-fake-domain.com", "officialDomain": "indiapost.gov.in", "isOfficial": false, "brand": "India Post" }
-   If no impersonation detected: "domainComparison": { "detected": false, "submittedDomain": "...", "officialDomain": "", "isOfficial": true, "brand": "" }` :
-    `Include: "urlIntelligence": { "isUrl": false, "domain": "", "threatScore": 0, "possibleTyposquatting": false, "typosquattingTarget": "", "usesUrlShortener": false, "suspiciousKeywords": [], "recommendation": "" }, "domainComparison": { "detected": false, "submittedDomain": "", "officialDomain": "", "isOfficial": true, "brand": "" }`;
+    // 5. Persist the analysis to the database
+    const snippet =
+      parsed.data.content.slice(0, 200) +
+      (parsed.data.content.length > 200 ? "..." : "");
 
-    const prompt = `You are the ScamShield AI Agent. Analyze the provided input — it may be a text message, email, URL, QR code content, social media post, job listing, or any communication used in a scam.
-
-INPUT TO ANALYZE:
-"${content.replace(/"/g, '\\"')}"
-
-ANALYSIS STEPS:
-1. Identify medium/format (SMS, email, URL, job post, QR redirect, etc.)
-2. Categorize scam type. If legitimate, say "Legitimate".
-3. Evaluate risk level (Low/Medium/High/Critical) and confidence score 0-100. Use precise numbers like 73 or 91, not round numbers.
-4. Analyze psychological triggers: Urgency, Authority, Scarcity, Fear, Emotional Manipulation, Greed.
-5. Identify vulnerable demographic groups.
-6. Break down the scammer's step-by-step attack chain.
-7. Write an ELI15 summary in plain, friendly language (2-3 sentences).
-8. AI-GENERATED CONTENT LIKELIHOOD: Assess whether this message was likely generated by AI.
-   Signals: generic/formal wording, professional tone despite suspicious content, mass-targeting phrasing, lack of personal details, unnaturally perfect grammar.
-   Include: "aiGeneratedLikelihood": { "likelihood": "Low"|"Moderate"|"High", "reasons": ["reason1", "reason2"], "disclaimer": "This is an estimate and not proof of AI generation." }
-${urlBlock}
-11. REPORTING LINKS: Based on the scam type and context, provide 3-5 relevant reporting destinations.
-   Examples: cybercrime.gov.in for any cybercrime, TRAI DND for spam calls, LinkedIn for job scams, specific bank fraud helplines, India Post for postal fraud, SEBI for investment fraud.
-   Include: "reportingLinks": [ { "platform": "Cyber Crime Portal", "url": "https://cybercrime.gov.in", "description": "Report to National Cyber Crime Reporting Portal" }, ... ]
-
-RETURN ONLY VALID JSON (no markdown, no code blocks):
-{
-  "type": "scam category",
-  "riskLevel": "Low"|"Medium"|"High"|"Critical",
-  "confidenceScore": number,
-  "reasoning": ["3-5 specific red flag observations"],
-  "recommendedActions": ["3-5 concrete actions"],
-  "preventionTips": ["3-4 prevention tips"],
-  "eli15": "plain English explanation",
-  "vulnerableGroups": ["group1", "group2"],
-  "scammerStrategy": ["Step 1: ...", "Step 2: ...", "Step 3: ..."],
-  "educationMode": {
-    "techniques": [
-      { "name": "Urgency", "detected": bool, "explanation": "one sentence" },
-      { "name": "Authority", "detected": bool, "explanation": "one sentence" },
-      { "name": "Scarcity", "detected": bool, "explanation": "one sentence" },
-      { "name": "Fear", "detected": bool, "explanation": "one sentence" },
-      { "name": "Emotional Manipulation", "detected": bool, "explanation": "one sentence" },
-      { "name": "Greed Appeal", "detected": bool, "explanation": "one sentence" }
-    ],
-    "whyThisMatters": "one sentence"
-  },
-  "urlIntelligence": { ... },
-  "domainComparison": { ... },
-  "aiGeneratedLikelihood": { ... },
-  "reportingLinks": [ ... ]
-}`;
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      config: {
-        responseMimeType: "application/json",
-        temperature: 0.1,
-        maxOutputTokens: 8192,
-      },
-    });
-
-    const rawText = response.text ?? "{}";
-    const cleanedText = rawText
-      .replace(/```json\s*/gi, "")
-      .replace(/```\s*/gi, "")
-      .trim();
-    let result;
-    try {
-      result = JSON.parse(cleanedText);
-    } catch {
-      res.status(500).json({ error: "Failed to parse AI response. Please try again." });
-      return;
-    }
-
-    const snippet = content.slice(0, 200) + (content.length > 200 ? "..." : "");
     await db.insert(analysesTable).values({
       contentSnippet: snippet,
-      riskLevel: result.riskLevel ?? "Low",
-      scamType: result.type ?? "Unknown",
-      confidenceScore: result.confidenceScore ?? 0,
+      riskLevel: result.riskLevel,
+      scamType: result.type,
+      confidenceScore: result.confidenceScore,
       fullResult: JSON.stringify(result),
     });
 
     res.json(result);
   } catch (err) {
-    req.log.error({ err }, "Gemini analysis failed");
+    req.log.error({ err }, "Orchestrator pipeline failed");
     res.status(500).json({ error: "AI analysis failed. Please try again." });
   }
 });
@@ -148,11 +101,14 @@ router.post("/emergency", async (req, res) => {
     .map((e) => exposureDescriptions[e] || e)
     .join(", ");
 
+  // Sanitize optional context field
+  const safeContext = scamContext ? sanitizeInput(scamContext) : "";
+
   const prompt = `You are a cybersecurity emergency response expert. A user has just fallen for a scam.
 
 WHAT HAPPENED:
 - Exposures: ${exposureList}
-${scamContext ? `- Scam context: ${scamContext}` : ""}
+${safeContext ? `- Scam context: ${safeContext}` : ""}
 
 Generate an IMMEDIATE recovery action plan. Be concise, calm, and actionable. Every minute matters.
 
@@ -164,7 +120,7 @@ RETURN ONLY VALID JSON (no markdown):
   "summary": "2-sentence calm reassurance + what to do first",
   "actions": [
     {
-      "priority": "immediate",
+      "priority": "immediate"|"urgent"|"soon",
       "title": "short action title",
       "description": "specific instructions",
       "timeframe": "Do this now / Within 30 minutes / Within 24 hours"
@@ -192,11 +148,11 @@ Rules:
       },
     });
 
-    const rawText = response.text ?? "{}";
-    const cleanedText = rawText
+    const cleanedText = (response.text ?? "{}")
       .replace(/```json\s*/gi, "")
       .replace(/```\s*/gi, "")
       .trim();
+
     let result;
     try {
       result = JSON.parse(cleanedText);

@@ -1,0 +1,257 @@
+You are a senior AI engineer and hackathon architect. Upgrade my existing project "ScamShield AI" into a Kaggle-capstone-quality AI agent system built using Google technologies and concepts from the 5-Day AI Agents Intensive course.
+
+IMPORTANT:
+
+* Do NOT rebuild from scratch.
+* Use my existing Next.js + TypeScript + Tailwind + Gemini implementation as the foundation.
+* Return COMPLETE working code changes with file-by-file outputs.
+* Preserve all current functionality while extending it.
+* The final result must feel like a real AI agent platform rather than a simple chatbot.
+
+PROJECT GOAL:
+ScamShield AI protects users from scams by analyzing suspicious content and educating them about social engineering tactics.
+
+TRACK:
+Agents for Good
+
+TECH STACK:
+
+* Next.js 15
+* TypeScript
+* Tailwind CSS
+* Gemini 1.5 Flash using Google AI Studio API
+* Deployable to Vercel
+* Firebase Authentication and Firestore preferred (if too complex, explain alternatives)
+* No API keys hardcoded anywhere
+
+KAGGLE REQUIREMENTS TO DEMONSTRATE:
+Implement at least 3 concepts from the course:
+
+1. Multi-agent system (ADK-inspired architecture)
+2. Agent skills / tool usage
+3. Security features
+4. Deployability
+5. MCP-style tool integration (simulated if necessary)
+
+ARCHITECTURE REQUIREMENTS:
+
+Create the following agent system:
+
+AGENT 1: Intake Agent
+Responsibilities:
+
+* Detect input type automatically.
+* Supported inputs:
+  • SMS messages
+  • Emails
+  • URLs
+  • QR-code text contents
+  • Job listings
+  • Social media DMs
+  • Phone call scripts
+* Output:
+  {
+  inputType,
+  extractedEntities,
+  detectedBrands
+  }
+
+AGENT 2: Threat Analysis Agent
+Responsibilities:
+
+* Identify scam type.
+* Detect:
+  • urgency
+  • authority impersonation
+  • fear tactics
+  • scarcity tactics
+  • emotional manipulation
+  • greed appeals
+* Produce:
+  • scam category
+  • confidence
+  • reasoning
+  • evidence
+
+AGENT 3: URL Intelligence Agent
+Responsibilities:
+
+* Analyze URLs found in content.
+* Detect:
+  • typosquatting
+  • suspicious keywords
+  • unofficial domains
+  • URL shorteners
+  • fake login indicators
+* Generate:
+  • URL threat score
+  • domain report
+  • safety recommendations
+
+AGENT 4: Education Agent
+Responsibilities:
+
+* Explain results in beginner-friendly language.
+* Generate:
+  • ELI15 explanation
+  • prevention tips
+  • why this matters section
+  • safety lessons
+
+AGENT 5: Vulnerability Agent
+Responsibilities:
+
+* Identify demographics most likely to be targeted.
+* Examples:
+  • students
+  • job seekers
+  • elderly users
+  • online shoppers
+  • people under financial pressure
+
+AGENT 6: Attack Chain Agent
+Responsibilities:
+
+* Generate the step-by-step strategy used by the scammer.
+* Example:
+  Step 1 → Build trust
+  Step 2 → Create urgency
+  Step 3 → Request action
+  Step 4 → Extract credentials
+  Step 5 → Monetize access
+
+AGENT 7: Orchestrator Agent
+Responsibilities:
+
+* Coordinate all other agents.
+* Merge outputs.
+* Produce the final response object for the frontend.
+
+MCP-STYLE TOOL SYSTEM:
+Implement a lightweight internal tool layer to simulate MCP concepts.
+
+Create tools such as:
+
+* classifyInputTool()
+* analyzeThreatTool()
+* scanUrlTool()
+* educationTool()
+* attackChainTool()
+* vulnerabilityTool()
+
+The orchestrator should call these tools explicitly.
+
+SECURITY FEATURES:
+Include:
+
+* Prompt injection protection
+* Input sanitization
+* Rate limiting placeholders
+* JSON schema validation
+* Safe fallback responses
+* Error boundaries
+
+AUTHENTICATION:
+Implement Firebase Authentication with:
+
+* Google Sign-In
+* Email/password login
+* Protected dashboard routes
+* Sign out
+
+DATABASE:
+Use Firestore for:
+
+* Analysis history
+* User profiles
+* Threat statistics
+* Saved reports
+
+USER DASHBOARD:
+Create a professional dashboard containing:
+
+* Welcome section
+* Recent analyses
+* Threat trends
+* Saved reports
+* User safety score
+* Scam categories encountered
+* Threat heatmap placeholder
+
+FRONTEND IMPROVEMENTS:
+Add:
+
+* Threat Score out of 100
+* Risk Level badges
+* Agent Thinking Timeline:
+  "Identifying input..."
+  "Analyzing threats..."
+  "Scanning URLs..."
+  "Generating education..."
+  "Preparing report..."
+* Safe vs Scam examples panel
+* Responsive mobile design
+* Dark mode toggle
+* Loading skeletons
+* Toast notifications
+
+REPORTING FEATURES:
+Add a section called "Report This Scam" containing placeholders and links for:
+
+* National Cyber Crime Portal (India)
+* CERT-In
+* TRAI spam reporting
+* Brand fraud reporting
+
+DEPLOYABILITY:
+Ensure the project is production-ready for Vercel:
+
+* Environment variable instructions
+* Build succeeds without modification
+* No unused code
+* Clear setup instructions
+
+CODE QUALITY:
+
+* Strong TypeScript typing
+* Modular architecture
+* Meaningful comments explaining agent behaviors
+* Reusable components
+* Clean folder structure
+
+RECOMMENDED FOLDER STRUCTURE:
+
+agents/
+intakeAgent.ts
+threatAgent.ts
+urlAgent.ts
+educationAgent.ts
+vulnerabilityAgent.ts
+attackChainAgent.ts
+orchestrator.ts
+
+tools/
+classifyInputTool.ts
+analyzeThreatTool.ts
+scanUrlTool.ts
+educationTool.ts
+vulnerabilityTool.ts
+attackChainTool.ts
+
+services/
+gemini.ts
+firebase.ts
+
+components/
+dashboard/
+auth/
+analysis/
+shared/
+
+OUTPUT FORMAT:
+Return COMPLETE implementation.
+Provide all modified and new files.
+Do not omit code.
+Do not provide pseudocode.
+Do not summarize.
+The result should be a working, deployable, Kaggle-capstone-quality multi-agent system that clearly demonstrates concepts learned during Google's 5-Day AI Agents Intensive course while preserving the original ScamShield identity.
