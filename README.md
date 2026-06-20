@@ -6,7 +6,7 @@
 
 ScamShield is a multi-agent AI system that analyzes suspicious messages, URLs, QR codes, emails, and job offers — then explains what the scam is, how it works, who it targets, and exactly what the user should do next.
 
-**Live Demo:** [ScamShield on Replit](https://scamshield.replit.app)  
+**Live Demo:** [ScamShield AI](https://your-deployment-url.com)  
 **Video:** [YouTube Demo (5 min)](https://youtube.com/your-link-here)
 
 ---
@@ -238,7 +238,7 @@ scamshield/
 | **MCP-Style Tool System** | `src/tools/` | 5 typed tool wrappers with structured I/O and safe fallbacks |
 | **Security Features** | `src/lib/security.ts` | Prompt injection detection, input sanitization, rate limiting |
 | **Agent Skills** | `intakeAgent.ts`, `reportingAgent.ts` | Specialized rule-based agents as non-AI skills |
-| **Deployability** | Replit + `.replit-artifact/` | Live deployment at `scamshield.replit.app` |
+| **Deployability** | Docker / VPS / Cloud — env-var driven config | Live public demo available |
 
 ---
 
@@ -348,15 +348,44 @@ curl -X POST https://your-deployment/api/scamshield/analyze \
 
 ---
 
-## Deployment (Replit)
+## Deployment
 
-This project is deployed via Replit's native artifact system:
+The project is fully environment-variable driven and can be deployed to any Node.js-compatible platform (Vercel, Railway, Render, Fly.io, VPS, etc.).
 
-1. Fork/clone this Repl
-2. Set environment secrets in the Replit Secrets panel (not `.env`)
-3. Click **Deploy** → Replit handles build, TLS, health checks, and CDN
+### Vercel (API + Frontend)
 
-The production app is available at the `.replit.app` subdomain immediately after deployment.
+1. Push this repo to GitHub
+2. Import in [Vercel](https://vercel.com) — set root to `artifacts/api-server` for the API, `artifacts/scamshield` for the frontend
+3. Set these environment variables in Vercel's dashboard:
+   ```
+   DATABASE_URL=your_postgres_connection_string
+   GOOGLE_GEMINI_API_KEY=your_gemini_api_key
+   SESSION_SECRET=your_random_secret
+   PORT=3000
+   BASE_PATH=/
+   ```
+4. Deploy — Vercel handles build, TLS, and CDN automatically
+
+### Docker / VPS
+
+```bash
+# Build the API server
+cd artifacts/api-server
+npm run build
+node dist/index.mjs
+
+# Build the frontend (outputs to dist/public)
+cd artifacts/scamshield
+npm run build
+# Serve dist/public with nginx or any static host
+```
+
+### Database
+
+Use [Neon](https://neon.tech) (free tier) or any PostgreSQL provider. Run the schema migration once:
+```bash
+pnpm --filter @workspace/db run push
+```
 
 ---
 

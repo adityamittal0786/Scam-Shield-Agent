@@ -39,6 +39,7 @@ import { runIntakeAgent } from "./intakeAgent.js";
 import { runUrlAgent } from "./urlAgent.js";
 import { runReportingAgent } from "./reportingAgent.js";
 import { sanitizeInput } from "../lib/security.js";
+import { withRetry } from "../lib/retry.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY || "" });
 
@@ -169,15 +170,18 @@ Respond with ONLY valid JSON (no markdown fences):
   ]
 }`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    config: {
-      responseMimeType: "application/json",
-      temperature: 0.1,
-      maxOutputTokens: 8192,
-    },
-  });
+  // Retry up to 3 times on 429 (rate limit) and 503 (high demand) errors
+  const response = await withRetry(() =>
+    ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: {
+        responseMimeType: "application/json",
+        temperature: 0.1,
+        maxOutputTokens: 8192,
+      },
+    })
+  );
 
   const raw = (response.text ?? "{}")
     .replace(/```json\s*/gi, "")
@@ -216,7 +220,10 @@ export async function runOrchestrator(rawInput: string): Promise<OrchestratorRes
   let urlResult = null;
   if (intake.extractedUrls.length > 0) {
     try {
-      urlResult = await runUrlAgent(content, intake.extractedUrls);
+      // URL agent also benefits from retry on transient Gemini errors
+      urlResult = await withRetry(() => runUrlAgent(content, intake.extractedUrls), {
+        maxAttempts: 2,
+      });
     } catch {
       // URL agent failure is non-fatal — analysis continues without it
       urlResult = null;
