@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "akd1iVXhH9QjoUYm0T6u2"
+uri = "file://README.md"
+type = "text"
+title = "ScamShield README — Kaggle Submission"
