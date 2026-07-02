@@ -183,12 +183,23 @@ Respond with ONLY valid JSON (no markdown fences):
     })
   );
 
-  const raw = (response.text ?? "{}")
+  let raw = (response.text ?? "{}")
     .replace(/```json\s*/gi, "")
     .replace(/```\s*/gi, "")
     .trim();
 
-  return JSON.parse(raw);
+  // Try to extract JSON if there's extra text before/after
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    raw = jsonMatch[0];
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch (parseErr) {
+    console.error("Failed to parse AI response:", raw);
+    throw new Error(`AI returned invalid JSON: ${parseErr instanceof Error ? parseErr.message : 'Unknown error'}`);
+  }
 }
 
 /**

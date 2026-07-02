@@ -68,13 +68,13 @@ export default function History() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
             </div>
           ) : history && history.length > 0 ? (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="w-[100px] font-mono">Risk</TableHead>
                     <TableHead className="w-[150px] font-mono">Type</TableHead>
-                    <TableHead className="font-mono">Content Snippet</TableHead>
+                    <TableHead className="font-mono min-w-[200px]">Content Snippet</TableHead>
                     <TableHead className="w-[120px] text-right font-mono">Analyzed</TableHead>
                     <TableHead className="w-[60px]" />
                   </TableRow>
@@ -87,7 +87,7 @@ export default function History() {
                       <TableCell className="max-w-xs truncate text-muted-foreground font-mono text-xs">
                         {record.contentSnippet}
                       </TableCell>
-                      <TableCell className="text-right text-xs text-muted-foreground">
+                      <TableCell className="text-right text-xs text-muted-foreground whitespace-nowrap">
                         {formatDistanceToNow(new Date(record.analyzedAt), { addSuffix: true })}
                       </TableCell>
                       <TableCell>

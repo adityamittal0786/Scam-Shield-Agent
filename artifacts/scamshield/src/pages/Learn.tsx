@@ -113,15 +113,15 @@ export default function Learn() {
                 onClick={() => setExpandedLesson(isExpanded ? null : lesson.id)}
                 data-testid={`lesson-${lesson.id}`}
               >
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="space-y-2">
-                    <CardTitle className="text-xl flex items-center gap-2">
+                    <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
                       {lesson.title}
                       {isCompleted && <CheckCircle className="w-5 h-5 text-emerald-500 inline" />}
                     </CardTitle>
-                    {!isExpanded && <CardDescription>{lesson.preview}</CardDescription>}
+                    {!isExpanded && <CardDescription className="text-sm">{lesson.preview}</CardDescription>}
                   </div>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-center flex-wrap">
                     {isCompleted && (
                       <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/30">
                         Completed

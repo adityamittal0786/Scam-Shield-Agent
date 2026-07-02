@@ -183,7 +183,7 @@ export default function Analyzer() {
             <h3 className="text-sm font-mono uppercase font-bold text-muted-foreground flex items-center gap-2">
               <Shield className="w-4 h-4" /> Try a Quick Example
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {QUICK_EXAMPLES.map((example, i) => (
                 <Card 
                   key={i} 
@@ -306,7 +306,7 @@ export default function Analyzer() {
 
       {/* Emergency Modal */}
       <Dialog open={emergencyOpen} onOpenChange={setEmergencyOpen}>
-        <DialogContent className="sm:max-w-2xl border-destructive/30 shadow-2xl shadow-destructive/10">
+        <DialogContent className="sm:max-w-2xl border-destructive/30 shadow-2xl shadow-destructive/10 max-w-[95vw] max-h-[90vh] overflow-y-auto">
           
           {emergencyMutation.isPending ? (
             <div className="py-16 flex flex-col items-center justify-center space-y-6">

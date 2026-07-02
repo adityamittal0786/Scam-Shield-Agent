@@ -71,12 +71,12 @@ ScamShield implements a true multi-agent pipeline inspired by Google's Agent Dev
 
 | File | Agent | AI Call | Responsibility |
 |------|-------|---------|----------------|
-| `intakeAgent.ts` | Intake Agent | ❌ Rules | Input classification, URL extraction, brand detection |
-| `threatAgent.ts` | Threat Analysis Agent | ✅ Gemini | Scam type, risk level, confidence, psychological tactics |
-| `educationAgent.ts` | Education Agent | ✅ Gemini | ELI15 explanation, prevention tips, recommended actions |
-| `vulnerabilityAgent.ts` | Vulnerability Agent | ✅ Gemini | At-risk demographic groups, attacker's step-by-step strategy |
-| `urlAgent.ts` | URL Intelligence Agent | ✅ Gemini | Domain analysis, typosquatting, threat scoring |
-| `reportingAgent.ts` | Reporting Agent | ❌ Rules | Context-aware reporting links (Indian + global authorities) |
+| `intakeAgent.ts` | Intake Agent | No (Rules) | Input classification, URL extraction, brand detection |
+| `threatAgent.ts` | Threat Analysis Agent | Yes (Gemini) | Scam type, risk level, confidence, psychological tactics |
+| `educationAgent.ts` | Education Agent | Yes (Gemini) | ELI15 explanation, prevention tips, recommended actions |
+| `vulnerabilityAgent.ts` | Vulnerability Agent | Yes (Gemini) | At-risk demographic groups, attacker's step-by-step strategy |
+| `urlAgent.ts` | URL Intelligence Agent | Yes (Gemini) | Domain analysis, typosquatting, threat scoring |
+| `reportingAgent.ts` | Reporting Agent | No (Rules) | Context-aware reporting links (Indian + global authorities) |
 | `orchestrator.ts` | Orchestrator | — | Pipeline coordination, agent sequencing, response assembly |
 
 ---
@@ -132,13 +132,13 @@ Thirteen regex patterns detect known injection phrases before any input reaches 
 While the agent pipeline runs, the frontend displays a real-time animated timeline showing which agent is active:
 
 ```
-✅ Intake Agent          — Classifying input type and extracting entities
-⟳ Threat Analysis Agent — Scanning for scam patterns and psychological tactics   ← active
-◯ URL Intelligence Agent — Analyzing domain and checking for typosquatting
-◯ Education Agent        — Generating plain-language explanation and safety tips
-◯ Vulnerability Agent    — Identifying at-risk groups and mapping attack chain
-◯ Reporting Agent        — Selecting relevant authorities to report this scam
-◯ Orchestrator           — Assembling final threat report
+[Done] Intake Agent          — Classifying input type and extracting entities
+[Active] Threat Analysis Agent — Scanning for scam patterns and psychological tactics
+[Pending] URL Intelligence Agent — Analyzing domain and checking for typosquatting
+[Pending] Education Agent        — Generating plain-language explanation and safety tips
+[Pending] Vulnerability Agent    — Identifying at-risk groups and mapping attack chain
+[Pending] Reporting Agent        — Selecting relevant authorities to report this scam
+[Pending] Orchestrator           — Assembling final threat report
 ```
 
 ---
@@ -247,7 +247,6 @@ scamshield/
 ### Prerequisites
 - Node.js 24+
 - pnpm (`npm install -g pnpm`)
-- PostgreSQL database (local or [Neon](https://neon.tech) free tier)
 - Google AI Studio API key ([Get one free](https://aistudio.google.com/app/apikey))
 
 ### 1. Clone and install
@@ -263,37 +262,26 @@ pnpm install
 Create `artifacts/api-server/.env`:
 
 ```env
-DATABASE_URL=postgres://user:password@localhost:5432/scamshield
 GOOGLE_GEMINI_API_KEY=your_api_key_here
 SESSION_SECRET=any_long_random_string_here
 PORT=8080
 ```
 
-> ⚠️ **Never commit `.env` to version control.** The `.gitignore` already excludes it.
+> **WARNING:** Never commit `.env` to version control. The `.gitignore` already excludes it.
 
-### 3. Initialize the database
-
-```bash
-pnpm --filter @workspace/db run push
-```
-
-### 4. Generate API client code
-
-```bash
-pnpm --filter @workspace/api-spec run codegen
-```
-
-### 5. Start development servers
+### 3. Start development servers
 
 ```bash
 # Terminal 1 — API server
-pnpm --filter @workspace/api-server run dev
+cd artifacts/api-server
+pnpm dev
 
 # Terminal 2 — Frontend
-pnpm --filter @workspace/scamshield run dev
+cd artifacts/scamshield
+pnpm dev
 ```
 
-Frontend: `http://localhost:24814`  
+Frontend: `http://localhost:5173`  
 API: `http://localhost:8080`
 
 ---
@@ -395,8 +383,8 @@ pnpm --filter @workspace/db run push
 |-------|-----------|
 | AI | Google Gemini 2.5 Flash (`@google/genai`) |
 | API | Express 5, TypeScript |
-| Database | PostgreSQL + Drizzle ORM |
-| Validation | Zod v4, `drizzle-zod` |
+| Storage | In-memory storage (development) |
+| Validation | Zod v4 |
 | API Contract | OpenAPI 3.0 spec + Orval codegen |
 | Frontend | React 19, Vite 7, Tailwind CSS, shadcn/ui |
 | State | TanStack Query v5 |
