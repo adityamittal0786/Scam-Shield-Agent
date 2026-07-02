@@ -13,7 +13,7 @@
  *   GET  /stats        → Aggregate statistics
  */
 
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import { GoogleGenAI } from "@google/genai";
 import { db, analysesTable } from "@workspace/db";
 import { desc, sql, eq } from "drizzle-orm";
@@ -21,7 +21,7 @@ import { AnalyzeContentBody, GetEmergencyActionsBody } from "@workspace/api-zod"
 import { runOrchestrator } from "../agents/orchestrator.js";
 import { validateInput, checkRateLimit, sanitizeInput } from "../lib/security.js";
 
-const router = Router();
+const router: IRouter = Router();
 
 // Shared AI client for the emergency route (other routes use agent modules)
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY || "" });
