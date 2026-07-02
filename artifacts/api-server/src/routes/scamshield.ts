@@ -185,9 +185,9 @@ router.get("/history", async (req, res) => {
       .limit(50);
 
     res.json(
-      records.map((r) => ({
-        ...r,
-        analyzedAt: r.analyzedAt.toISOString(),
+      records.map((record: { analyzedAt: Date }) => ({
+        ...record,
+        analyzedAt: record.analyzedAt.toISOString(),
       }))
     );
   } catch (err) {
