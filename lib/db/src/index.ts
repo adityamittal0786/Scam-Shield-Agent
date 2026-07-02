@@ -8,7 +8,7 @@ const inMemoryStorage: any[] = [];
 let currentGroupColumn: string | null = null;
 
 // Mock db interface for in-memory storage
-export const db = {
+export const db: any = {
   insert: (table: any) => ({
     values: (data: any) => {
       const record = {
