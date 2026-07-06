@@ -113,13 +113,11 @@ export const db: any = {
       where: (condition: any) => {
         whereCondition = condition;
         return chain;
-      }
-    };
-
-    return {
-      ...chain,
+      },
       then: (resolve: any, reject: any) => execute().then(resolve, reject)
     };
+
+    return chain;
   },
   update: (table: any) => ({
     set: (data: any) => ({

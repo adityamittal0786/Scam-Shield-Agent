@@ -259,15 +259,25 @@ pnpm install
 
 ### 2. Environment variables
 
-Create `artifacts/api-server/.env`:
+Create a local env file from [artifacts/api-server/.env.example](artifacts/api-server/.env.example):
 
-```env
-GOOGLE_GEMINI_API_KEY=your_api_key_here
-SESSION_SECRET=any_long_random_string_here
-PORT=8080
+```bash
+cp artifacts/api-server/.env.example artifacts/api-server/.env
 ```
 
-> **WARNING:** Never commit `.env` to version control. The `.gitignore` already excludes it.
+If you prefer a repo-root template for deployment notes, [`.env.example`](.env.example) contains the same values.
+
+```env
+DATABASE_URL=your_postgres_connection_string
+GOOGLE_GEMINI_API_KEY=your_api_key_here
+CLIENT_ID=your_replit_oidc_client_id
+REPL_ID=your_replit_app_client_id
+ISSUER_URL=https://replit.com/oidc
+PORT=8080
+BASE_PATH=/
+```
+
+> **WARNING:** Never commit `.env` to version control. Keep it local and use Render dashboard environment variables in production.
 
 ### 3. Start development servers
 
@@ -339,6 +349,15 @@ curl -X POST https://your-deployment/api/scamshield/analyze \
 ## Deployment
 
 The project is fully environment-variable driven and can be deployed to any Node.js-compatible platform (Vercel, Railway, Render, Fly.io, VPS, etc.).
+
+### Render
+
+This repo is ready for a single Render web service that serves both the API and the built frontend from the same origin.
+
+1. Create a new Render service from this repo and point it at [render.yaml](render.yaml)
+2. Set the environment variables from [`.env.example`](.env.example) in the Render dashboard
+3. Keep the start command as `pnpm --dir artifacts/api-server start`
+4. Render will build the workspace with `pnpm run build`, then the API server will serve the frontend from `artifacts/scamshield/dist/public` when it exists
 
 ### Vercel (API + Frontend)
 

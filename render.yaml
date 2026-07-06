@@ -1,0 +1,26 @@
+services:
+  # API Server
+  - type: web
+    name: scam-shield-api
+    env: node
+    plan: free
+    buildCommand: cd artifacts/api-server && pnpm install && pnpm run build
+    startCommand: cd artifacts/api-server && node dist/index.mjs
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+
+  # Frontend
+  - type: web
+    name: scam-shield-frontend
+    env: static
+    plan: free
+    buildCommand: cd artifacts/scamshield && pnpm install && pnpm run build
+    staticPublishPath: artifacts/scamshield/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://scam-shield-api.onrender.com
+    autoDeploy: true

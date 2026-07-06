@@ -184,8 +184,10 @@ router.get("/history", async (req, res) => {
       .orderBy(desc(analysesTable.analyzedAt))
       .limit(50);
 
+    const recordsArray = Array.isArray(records) ? records : [];
+    
     res.json(
-      records.map((record: { analyzedAt: Date }) => ({
+      recordsArray.map((record: { analyzedAt: Date }) => ({
         ...record,
         analyzedAt: record.analyzedAt.toISOString(),
       }))
@@ -225,9 +227,10 @@ router.delete("/history/:id", async (req, res) => {
 // ─── GET /stats ───────────────────────────────────────────────────────────────
 router.get("/stats", async (req, res) => {
   try {
-    const [totalRow] = await db
+    const totalResult = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(analysesTable);
+    const totalRow = Array.isArray(totalResult) ? totalResult[0] : totalResult;
 
     const byRiskRows = await db
       .select({
@@ -247,15 +250,18 @@ router.get("/stats", async (req, res) => {
       .orderBy(desc(sql`count(*)`))
       .limit(10);
 
-    const [avgRow] = await db
+    const avgResult = await db
       .select({ avg: sql<number>`avg(confidence_score)::float` })
       .from(analysesTable);
+    const avgRow = Array.isArray(avgResult) ? avgResult[0] : avgResult;
 
     const byRiskLevel: Record<string, number> = {};
-    for (const row of byRiskRows) byRiskLevel[row.riskLevel] = row.count;
+    const byRiskArray = Array.isArray(byRiskRows) ? byRiskRows : [];
+    for (const row of byRiskArray) byRiskLevel[row.riskLevel] = row.count;
 
     const byType: Record<string, number> = {};
-    for (const row of byTypeRows) byType[row.scamType] = row.count;
+    const byTypeArray = Array.isArray(byTypeRows) ? byTypeRows : [];
+    for (const row of byTypeArray) byType[row.scamType] = row.count;
 
     res.json({
       totalAnalyzed: totalRow?.count ?? 0,

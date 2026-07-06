@@ -1,0 +1,15 @@
+{
+  "buildCommand": "cd artifacts/scamshield && pnpm install && pnpm run build",
+  "outputDirectory": "artifacts/scamshield/dist",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "@api-url"
+  }
+}
