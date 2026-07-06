@@ -3,7 +3,6 @@ services:
   - type: web
     name: scam-shield-api
     env: node
-    plan: starter
     buildCommand: cd artifacts/api-server && pnpm install && pnpm run build
     startCommand: cd artifacts/api-server && node dist/index.mjs
     envVars:
@@ -13,16 +12,3 @@ services:
         value: production
       - key: GOOGLE_GEMINI_API_KEY
         sync: false
-    autoDeploy: true
-
-  # Frontend
-  - type: web
-    name: scam-shield-frontend
-    env: static
-    plan: starter
-    buildCommand: cd artifacts/scamshield && pnpm install && pnpm run build
-    staticPublishPath: artifacts/scamshield/dist/public
-    envVars:
-      - key: VITE_API_URL
-        value: https://scam-shield-api.onrender.com
-    autoDeploy: true
