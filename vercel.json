@@ -1,6 +1,5 @@
 {
-  "rootDirectory": "artifacts/scamshield",
-  "outputDirectory": "dist/public",
+  "outputDirectory": "artifacts/scamshield/dist/public",
   "rewrites": [
     {
       "source": "/(.*)",
