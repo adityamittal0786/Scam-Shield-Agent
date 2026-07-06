@@ -1,32 +1,27 @@
 # Deployment Guide
 
-This project is configured for easy deployment to Vercel (frontend) and Railway (API). No database is required - it uses in-memory storage.
+This project is configured for easy deployment. No database is required - it uses in-memory storage.
 
 ## Prerequisites
 
 - Google AI Studio API key ([Get one free](https://aistudio.google.com/app/apikey))
 - GitHub account
 
-## Free Deployment Options
+## Recommended Deployment: Netlify (Free)
 
-**For Frontend (Vercel):** Completely free, no payment info required
-**For API (Railway):** Free tier available, no payment info required
+Due to monorepo complexity with Vercel, Netlify is recommended for the frontend deployment.
 
-## Option 1: Deploy Frontend to Vercel (Free)
+### Deploy Frontend to Netlify (Free)
 
-1. Go to [vercel.com](https://vercel.com) and sign in with GitHub
-2. Click "Add New Project"
-3. Import your repository: `adityamittal0786/Scam-Shield-Agent`
+1. Go to [netlify.com](https://netlify.com) and sign in with GitHub
+2. Click "Add new site" → "Import an existing project"
+3. Select your repository: `adityamittal0786/Scam-Shield-Agent`
 4. Configure:
-   - **Framework Preset**: Vite (auto-detected)
-   - **Root Directory**: artifacts/scamshield
-   - **Build Command**: pnpm install && pnpm run build
-   - **Output Directory**: dist/public
-5. Click "Deploy"
+   - **Build command**: `cd artifacts/scamshield && pnpm install && pnpm run build`
+   - **Publish directory**: `artifacts/scamshield/dist/public`
+5. Click "Deploy site"
 
-**Note:** The frontend will deploy but analysis features won't work without the API server.
-
-## Option 2: Deploy API to Railway (Free)
+### Deploy API to Railway (Free)
 
 1. Go to [railway.app](https://railway.app) and sign in with GitHub
 2. Click "New Project" → "Deploy from GitHub repo"
@@ -38,26 +33,41 @@ This project is configured for easy deployment to Vercel (frontend) and Railway 
 5. Click "Deploy"
 6. After deployment, copy your API URL (e.g., `https://your-app.railway.app`)
 
-## Option 3: Deploy API to Glitch (Free)
+### Connect Frontend to API
+
+After deploying both services:
+
+1. Go to your Netlify site settings
+2. Add environment variable:
+   - `VITE_API_URL`: Your Railway API URL
+3. Redeploy the frontend
+
+## Alternative: Vercel Manual Setup
+
+If you prefer Vercel, you need to manually configure it:
+
+1. **Delete current project** (if exists):
+   - Go to Vercel dashboard
+   - Delete "scam-shield-agent-api-serve"
+
+2. **Create new project**:
+   - Click "Add New Project"
+   - Import repository: `adityamittal0786/Scam-Shield-Agent`
+   - **Important**: Set "Root Directory" to `artifacts/scamshield`
+   - Framework: Vite (auto-detected)
+   - Build Command: `pnpm install && pnpm run build`
+   - Output Directory: `dist/public`
+
+3. **Add environment variable**:
+   - `VITE_API_URL`: Your API URL (deploy separately)
+
+## Alternative: Glitch (Free)
 
 1. Go to [glitch.com](https://glitch.com) and sign in
 2. Click "New Project" → "Import from GitHub"
 3. Enter your repository URL
 4. Add environment variables in `.env` file
 5. The app will auto-deploy
-
-## Connect Frontend to API
-
-After deploying the API:
-
-1. Go to your Vercel project settings
-2. Add environment variable:
-   - `VITE_API_URL`: Your Railway/Glitch API URL
-3. Redeploy the frontend
-
-## Alternative: Demo Mode (No API Required)
-
-For a demo without API deployment, you can modify the frontend to use mock data. This is suitable for showcasing the UI without actual AI analysis.
 
 ## Environment Variables Reference
 
@@ -78,7 +88,7 @@ For a demo without API deployment, you can modify the frontend to use mock data.
 ## Important Notes
 
 - **In-Memory Storage**: Data is stored in memory and will be lost when the server restarts. This is suitable for development and demos.
-- **Free Tier Limits**: Railway and Glitch have free tiers with limitations.
+- **Free Tier Limits**: Netlify, Railway, and Glitch have free tiers with limitations.
 - **API Key Security**: Never commit your `.env` file to GitHub. Always use environment variables in deployment settings.
 - **CORS**: The API is configured to allow requests from any origin.
 
