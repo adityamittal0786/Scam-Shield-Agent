@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd artifacts/scamshield && pnpm install && pnpm run build",
+  "buildCommand": "cd artifacts/scamshield && yarn install && yarn build",
   "outputDirectory": "artifacts/scamshield/dist/public",
   "rewrites": [
     {
