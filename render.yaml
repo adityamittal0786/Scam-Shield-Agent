@@ -3,7 +3,7 @@ services:
   - type: web
     name: scam-shield-api
     env: node
-    buildCommand: cd artifacts/api-server && npm install && npm run build
+    buildCommand: corepack enable && corepack prepare pnpm@latest --activate && cd artifacts/api-server && pnpm install && pnpm run build
     startCommand: cd artifacts/api-server && node dist/index.mjs
     envVars:
       - key: PORT

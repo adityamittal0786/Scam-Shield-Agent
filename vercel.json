@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd artifacts/scamshield && npm install && npm run build",
+  "buildCommand": "cd artifacts/scamshield && pnpm install && pnpm run build",
   "outputDirectory": "artifacts/scamshield/dist/public",
-  "installCommand": "npm install",
+  "installCommand": "corepack enable && corepack prepare pnpm@latest --activate && pnpm install",
   "framework": "vite",
   "rewrites": [
     {
