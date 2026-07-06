@@ -3,7 +3,7 @@ services:
   - type: web
     name: scam-shield-api
     env: node
-    plan: free
+    plan: starter
     buildCommand: cd artifacts/api-server && pnpm install && pnpm run build
     startCommand: cd artifacts/api-server && node dist/index.mjs
     envVars:
@@ -19,7 +19,7 @@ services:
   - type: web
     name: scam-shield-frontend
     env: static
-    plan: free
+    plan: starter
     buildCommand: cd artifacts/scamshield && pnpm install && pnpm run build
     staticPublishPath: artifacts/scamshield/dist/public
     envVars:
