@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd artifacts/scamshield && pnpm install --no-frozen-lockfile && pnpm run build",
+  "buildCommand": "cd artifacts/scamshield && npm install && npm run build",
   "outputDirectory": "artifacts/scamshield/dist/public",
-  "installCommand": "pnpm install --no-frozen-lockfile",
+  "installCommand": "npm install",
   "framework": "vite",
   "rewrites": [
     {

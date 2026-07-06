@@ -3,7 +3,7 @@ services:
   - type: web
     name: scam-shield-api
     env: node
-    buildCommand: cd artifacts/api-server && pnpm install --no-frozen-lockfile && pnpm run build
+    buildCommand: cd artifacts/api-server && npm install && npm run build
     startCommand: cd artifacts/api-server && node dist/index.mjs
     envVars:
       - key: PORT
