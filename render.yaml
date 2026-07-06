@@ -11,6 +11,8 @@ services:
         value: 8080
       - key: NODE_ENV
         value: production
+      - key: GOOGLE_GEMINI_API_KEY
+        sync: false
     autoDeploy: true
 
   # Frontend
@@ -19,7 +21,7 @@ services:
     env: static
     plan: free
     buildCommand: cd artifacts/scamshield && pnpm install && pnpm run build
-    staticPublishPath: artifacts/scamshield/dist
+    staticPublishPath: artifacts/scamshield/dist/public
     envVars:
       - key: VITE_API_URL
         value: https://scam-shield-api.onrender.com
